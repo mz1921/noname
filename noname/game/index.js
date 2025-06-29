@@ -1453,39 +1453,42 @@ export class Game extends GameCompatible {
 	 * @param { (result: boolean) => any } callback
 	 */
 	connect(ip, callback) {
-		if (game.online) return;
-		let withport = false;
-		let index = ip.lastIndexOf(":");
-		if (index != -1) {
-			index = parseFloat(ip.slice(index + 1));
-			if (index && Math.floor(index) == index) {
-				withport = true;
-			}
-		}
-		if (!withport) ip = ip + ":8080";
-		_status.connectCallback = callback;
-		try {
-			if (game.ws) {
-				game.ws._nocallback = true;
-				game.ws.close();
-				delete game.ws;
-			}
-			let str = "";
-			if (!ip.startsWith("wss://") && !ip.startsWith("ws://")) str = get.config("wss_mode", "connect") ? "wss://" : "ws://";
-			game.ws = new WebSocket(str + ip + "");
-		} catch {
-			// 今天狂神龙尊来了这里也没有参数
-			alert("错误：无效联机地址");
-			if (callback) callback(false);
-			return;
-		}
-		game.sandbox = security.createSandbox();
-		game.ws.onopen = lib.element.ws.onopen;
-		game.ws.onmessage = lib.element.ws.onmessage;
-		game.ws.onerror = lib.element.ws.onerror;
-		game.ws.onclose = lib.element.ws.onclose;
-		_status.ip = ip;
-	}
+    	if (game.online) return;
+
+    	ip = ip.trim()
+    		.replace(/^wss?:\/\//, '')
+    		.replace(/^https?:\/\//, '')
+    		.replace(/\/$/, '');
+
+    	// Add port 8080 only for local IPs
+    	const needsPort = !ip.includes(":") && /^(localhost|127\.|192\.168\.)/.test(ip);
+    	if (needsPort) ip += ":8080";
+
+    	_status.connectCallback = callback;
+
+    	try {
+    		if (game.ws) {
+    			game.ws._nocallback = true;
+    			game.ws.close();
+    			delete game.ws;
+    		}
+
+    		const prefix = get.config("wss_mode", "connect") ? "wss://" : "ws://";
+    		game.ws = new WebSocket(prefix + ip);
+    	} catch (e) {
+    		alert("错误：无效联机地址");
+    		if (callback) callback(false);
+    		return;
+    	}
+
+    	game.sandbox = security.createSandbox();
+    	game.ws.onopen = lib.element.ws.onopen;
+    	game.ws.onmessage = lib.element.ws.onmessage;
+    	game.ws.onerror = lib.element.ws.onerror;
+    	game.ws.onclose = lib.element.ws.onclose;
+    	_status.ip = ip;
+    }
+
 	send() {
 		if (game.observe && arguments[0] != "reinited") return;
 		if (game.ws) {
