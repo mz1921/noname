@@ -458,6 +458,7 @@ export class Create {
 			player.roomindex = i;
 			player.initRoom = lib.element.Player.prototype.initRoom;
 			player.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.connectroom);
+			console.log("eventlistener added")
 			player.initRoom(list[i]);
 			ui.rooms.push(player);
 		}

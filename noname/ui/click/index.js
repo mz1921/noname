@@ -2518,6 +2518,7 @@ export class Click {
 		ui.click.charactercard(player.name2, null, null, true, this, player.skin.name2 || player.name2);
 	}
 	connectroom(e) {
+		console.log("room clicked")
 		if (_status.dragged) return;
 		if (_status.clicked) return;
 		if (ui.intro) return;
@@ -2540,6 +2541,7 @@ export class Click {
 				_status.enteringroom = true;
 				_status.enteringroomserver = this.serving;
 				game.send("server", "enter", this.key, get.connectNickname(), lib.config.connect_avatar);
+				console.log("attempting to enter", this.key)
 			}
 		}
 	}
