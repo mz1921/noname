@@ -1473,7 +1473,8 @@ export class Game extends GameCompatible {
     			delete game.ws;
     		}
 
-    		const prefix = get.config("wss_mode", "connect") ? "wss://" : "ws://";
+    		const isSecurePage = location.protocol === 'https:';
+            const prefix = isSecurePage ? "wss://" : "ws://";
     		game.ws = new WebSocket(prefix + ip);
     	} catch (e) {
     		alert("错误：无效联机地址");
