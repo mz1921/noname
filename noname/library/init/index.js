@@ -126,12 +126,27 @@ export class LibInit {
 		}
 	}
 
-	connection(ws) {
+	connection(ws, nickname = "", avatar = "") {
 		const client = new lib.element.Client(ws);
+		client.nickname = nickname;
+        client.avatar = avatar;
+        console.log("client" + client.nickname + "has joined the room");
 		lib.node.clients.push(client);
+
 		if (window.isNonameServer) {
 			document.querySelector("#server_count").innerHTML = lib.node.clients.length;
 		}
+
+		const emptySlot = game.connectPlayers.find(p => !p.nickname && !p.playerid);
+		console.log("found player slot")
+		if (emptySlot) {
+			emptySlot.nickname = client.nickname;
+			emptySlot.avatar = client.avatar;
+			emptySlot.playerid = client.id;
+		} else {
+			console.warn("No available player slots to assign this connection!");
+		}
+
 		ws.on("message", function (messagestr) {
 			var message;
 			try {

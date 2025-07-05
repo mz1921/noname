@@ -12688,7 +12688,14 @@ export class Library {
 					ui.connecting.firstChild.innerHTML = "重连成功";
 				}
 			},
-			onconnection: id => lib.init.connection((lib.wsOL[id] = new lib.element.NodeWS(id))),
+			onconnection: (id, nickname, avatar) => {
+				console.log(nickname + ", " + avatar )
+				const node = new lib.element.NodeWS(id);
+				node.nickname = nickname;
+				node.avatar = avatar;
+				lib.wsOL[id] = node;
+				lib.init.connection(node, nickname, avatar);
+			},
 			onmessage: function (id, message) {
 				if (lib.wsOL[id]) {
 					lib.wsOL[id].onmessage(message);
@@ -12728,6 +12735,9 @@ export class Library {
 					game.switchMode(lib.configOL.mode);
 				}
 				ui.create.connecting(true);
+			},
+			enterroom: function (key, ownerName, ownerAvatar) {
+				console.log("✅ Successfully entered room");
 			},
 			enterroomfailed: function () {
 				alert("请稍后再试");
